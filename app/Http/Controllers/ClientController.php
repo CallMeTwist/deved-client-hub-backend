@@ -18,7 +18,7 @@ class ClientController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('view_clients'); // Uses Spatie Gate
+//        $this->authorize('view_clients'); // Uses Spatie Gate
 
         $clients = Client::where('tenant_id', $request->user()->tenant_id)
             ->when($request->search, fn ($q) => $q->search($request->search))
