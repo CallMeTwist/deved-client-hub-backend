@@ -49,4 +49,27 @@ Route::middleware(['auth:sanctum', 'tenant.scope'])->group(function () {
 
     // Templates — no destroy (use is_active=false to deactivate)
     Route::apiResource('templates', TemplateController::class)->except(['destroy']);
+
+    // Notes
+    Route::prefix('clients/{client}/notes')->group(function () {
+        Route::get('/',        [\App\Http\Controllers\ClientNoteController::class, 'index'])->middleware('can:view_records');
+        Route::post('/',       [\App\Http\Controllers\ClientNoteController::class, 'store'])->middleware('can:create_records');
+        Route::delete('/{note}', [\App\Http\Controllers\ClientNoteController::class, 'destroy'])->middleware('can:create_records');
+    });
+
+// Files
+    Route::prefix('clients/{client}/files')->group(function () {
+        Route::get('/',              [\App\Http\Controllers\ClientFileController::class, 'index'])->middleware('can:view_records');
+        Route::post('/',             [\App\Http\Controllers\ClientFileController::class, 'store'])->middleware('can:create_records');
+        Route::delete('/{file}',     [\App\Http\Controllers\ClientFileController::class, 'destroy'])->middleware('can:create_records');
+        Route::get('/{file}/download', [\App\Http\Controllers\ClientFileController::class, 'download'])->middleware('can:view_records');
+        Route::get('/{file}/preview',    [\App\Http\Controllers\ClientFileController::class, 'preview'])->middleware('can:view_records');  // ← ADD// ← ADD THIS
+    });
+
+// Interactions
+    Route::prefix('clients/{client}/interactions')->group(function () {
+        Route::get('/',                    [\App\Http\Controllers\ClientInteractionController::class, 'index'])->middleware('can:view_records');
+        Route::post('/',                   [\App\Http\Controllers\ClientInteractionController::class, 'store'])->middleware('can:create_records');
+        Route::delete('/{interaction}',    [\App\Http\Controllers\ClientInteractionController::class, 'destroy'])->middleware('can:create_records');
+    });
 });

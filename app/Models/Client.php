@@ -25,6 +25,21 @@ class Client extends Model
         'metadata'      => 'array',
     ];
 
+    public function notes(): HasMany
+    {
+        return $this->hasMany(ClientNote::class);
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(ClientFile::class);
+    }
+
+    public function interactions(): HasMany
+    {
+        return $this->hasMany(ClientInteraction::class);
+    }
+
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
