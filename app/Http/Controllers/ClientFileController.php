@@ -58,6 +58,14 @@ class ClientFileController extends Controller
             'size'        => $uploaded->getSize(),
         ]);
 
+        \App\Models\UserNotification::createForAdmins(
+            $request->user()->tenant_id,
+            'file_uploaded',
+            'File uploaded',
+            "{$request->user()->name} uploaded {$file->name} for {$client->full_name}.",
+            "/clients/{$client->id}"
+        );
+
         return response()->json([
             'message' => 'File uploaded.',
             'data'    => [

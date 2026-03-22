@@ -41,6 +41,22 @@ class ClientController extends Controller
             'created_by' => $request->user()->id,
         ]);
 
+        \App\Models\ActivityLog::log(
+            $request->user()->tenant_id,
+            $request->user()->id,
+            'client_created',
+            "Created new client: {$client->full_name}",
+            "/clients/{$client->id}"
+        );
+
+        \App\Models\UserNotification::createForAdmins(
+            $request->user()->tenant_id,
+            'client_created',
+            'New client added',
+            "{$request->user()->name} registered a new client: {$client->full_name}.",
+            "/clients/{$client->id}"
+        );
+
         return response()->json([
             'message' => 'Client created successfully.',
             'data'    => new ClientResource($client),
@@ -67,6 +83,15 @@ class ClientController extends Controller
         $this->authorizeTenant($request, $client);
 
         $client->update($request->validated());
+
+        \App\Models\ActivityLog::log(
+            $request->user()->tenant_id,
+            $request->user()->id,
+            'client_updated',
+            "Updated {$client->full_name}'s profile",
+            "/clients/{$client->id}"
+        );
+
 
         return response()->json([
             'message' => 'Client updated successfully.',

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -36,6 +37,8 @@ Route::middleware(['auth:sanctum', 'tenant.scope'])->group(function () {
         Route::get('user',    [AuthController::class, 'user']);
     });
 
+    Route::get('user/activity', [ActivityController::class, 'index']);
+
     // Clients CRUD
     // Authorization is checked in each FormRequest::authorize() and controller
     Route::apiResource('clients', ClientController::class);
@@ -54,6 +57,7 @@ Route::middleware(['auth:sanctum', 'tenant.scope'])->group(function () {
     Route::prefix('clients/{client}/notes')->group(function () {
         Route::get('/',        [\App\Http\Controllers\ClientNoteController::class, 'index'])->middleware('can:view_records');
         Route::post('/',       [\App\Http\Controllers\ClientNoteController::class, 'store'])->middleware('can:create_records');
+        Route::put('/{note}',    [\App\Http\Controllers\ClientNoteController::class, 'update'])->middleware('can:create_records');
         Route::delete('/{note}', [\App\Http\Controllers\ClientNoteController::class, 'destroy'])->middleware('can:create_records');
     });
 
@@ -71,5 +75,12 @@ Route::middleware(['auth:sanctum', 'tenant.scope'])->group(function () {
         Route::get('/',                    [\App\Http\Controllers\ClientInteractionController::class, 'index'])->middleware('can:view_records');
         Route::post('/',                   [\App\Http\Controllers\ClientInteractionController::class, 'store'])->middleware('can:create_records');
         Route::delete('/{interaction}',    [\App\Http\Controllers\ClientInteractionController::class, 'destroy'])->middleware('can:create_records');
+    });
+
+    Route::prefix('notifications')->group(function () {
+        Route::get('/',             [\App\Http\Controllers\NotificationController::class, 'index']);
+        Route::patch('/read-all',   [\App\Http\Controllers\NotificationController::class, 'markAllRead']);
+        Route::patch('/{notification}/read',    [\App\Http\Controllers\NotificationController::class, 'markRead']);
+        Route::delete('/{notification}',        [\App\Http\Controllers\NotificationController::class, 'destroy']);
     });
 });

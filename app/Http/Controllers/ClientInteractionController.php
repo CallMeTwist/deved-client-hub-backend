@@ -56,6 +56,14 @@ class ClientInteractionController extends Controller
             'duration_minutes' => $request->duration_minutes,
         ]);
 
+        \App\Models\ActivityLog::log(
+            $request->user()->tenant_id,
+            $request->user()->id,
+            'interaction_logged',
+            "Logged a {$interaction->type} interaction with {$client->full_name}",
+            "/clients/{$client->id}"
+        );
+
         return response()->json([
             'message' => 'Interaction logged.',
             'data'    => [

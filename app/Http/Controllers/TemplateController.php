@@ -70,6 +70,14 @@ class TemplateController extends Controller
             'created_by' => $request->user()->id,
         ]);
 
+        \App\Models\ActivityLog::log(
+            $tenantId,
+            $request->user()->id,
+            'template_created',
+            "Created template: {$template->name}",
+            "/templates/{$template->id}/edit"
+        );
+
         return response()->json([
             'message' => 'Template created successfully.',
             'data'    => new TemplateResource($template),

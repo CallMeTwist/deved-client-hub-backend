@@ -81,6 +81,22 @@ class RecordController extends Controller
             'created_by'       => $request->user()->id,
         ]);
 
+        \App\Models\ActivityLog::log(
+            $tenantId,
+            $request->user()->id,
+            'record_created',
+            "Added a " . str_replace('_', ' ', $template->key) . " record for {$client->full_name}",
+            "/clients/{$client->id}"
+        );
+
+        \App\Models\UserNotification::createForAdmins(
+            $tenantId,
+            'record_created',
+            'New record added',
+            "{$request->user()->name} added a " . str_replace('_', ' ', $template->key) . " record for {$client->full_name}.",
+            "/clients/{$client->id}"
+        );
+
         return response()->json([
             'message' => 'Record saved successfully.',
             'data'    => new RecordResource($record->load(['creator:id,name'])),

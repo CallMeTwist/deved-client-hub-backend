@@ -67,17 +67,26 @@ class Template extends Model
 
             $value = $data[$name] ?? null;
 
-            if ($required && ($value === null || $value === '')) {
+            // Treat empty string as null — frontend sends "" for unfilled optional fields
+            if ($value === '') {
+                $value = null;
+            }
+
+            // Required check
+            if ($required && $value === null) {
                 $errors[$name][] = "The {$name} field is required.";
                 continue;
             }
 
+            // Skip all further checks if value is empty and field is optional
             if ($value === null) {
                 continue;
             }
 
+            // Type checks
             match ($type) {
-                'number'  => is_numeric($value) ?: $errors[$name][] = "{$name} must be a number.",
+                'number'  => is_numeric($value)
+                    ?: $errors[$name][] = "{$name} must be a number.",
                 'boolean' => is_bool($value) || in_array($value, [0, 1, '0', '1', 'true', 'false'], true)
                     ?: $errors[$name][] = "{$name} must be boolean.",
                 'select'  => in_array($value, $field['options'] ?? [], true)
@@ -85,7 +94,8 @@ class Template extends Model
                 default   => null,
             };
 
-            if ($type === 'number' && isset($field['validation'])) {
+            // Min/max validation for numbers
+            if ($type === 'number' && is_numeric($value) && isset($field['validation'])) {
                 $rules = $field['validation'];
                 if (isset($rules['min']) && $value < $rules['min']) {
                     $errors[$name][] = "{$name} must be at least {$rules['min']}.";
